@@ -5,39 +5,19 @@
 
 #include <climits>
 #include <cstddef>
+#include <cstring>
+#include <new>
 
 namespace sjtu
 {
-/**
- * a data container like std::vector
- * store data in a successive memory and support random access.
- */
+
 template<typename T>
 class vector
 {
 public:
-	/**
-	 * TODO
-	 * a type for actions of the elements of a vector, and you should write
-	 *   a class named const_iterator with same interfaces.
-	 */
-	/**
-	 * you can see RandomAccessIterator at CppReference for help.
-	 */
 	class const_iterator;
 	class iterator
 	{
-	// The following code is written for the C++ type_traits library.
-	// Type traits is a C++ feature for describing certain properties of a type.
-	// For instance, for an iterator, iterator::value_type is the type that the
-	// iterator points to.
-	// STL algorithms and containers may use these type_traits (e.g. the following
-	// typedef) to work properly. In particular, without the following code,
-	// @code{std::sort(iter, iter1);} would not compile.
-	// See these websites for more information:
-	// https://en.cppreference.com/w/cpp/header/type_traits
-	// About value_type: https://blog.csdn.net/u014299153/article/details/72419713
-	// About iterator_category: https://en.cppreference.com/w/cpp/iterator
 	public:
 		using difference_type = std::ptrdiff_t;
 		using value_type = T;
@@ -46,72 +26,78 @@ public:
 		using iterator_category = std::output_iterator_tag;
 
 	private:
-		/**
-		 * TODO add data members
-		 *   just add whatever you want.
-		 */
+		T *ptr;
 	public:
-		/**
-		 * return a new iterator which pointer n-next elements
-		 * as well as operator-
-		 */
+		iterator(T *p = nullptr) : ptr(p) {}
+
 		iterator operator+(const int &n) const
 		{
-			//TODO
+			return iterator(ptr + n);
 		}
 		iterator operator-(const int &n) const
 		{
-			//TODO
+			return iterator(ptr - n);
 		}
-		// return the distance between two iterators,
-		// if these two iterators point to different vectors, throw invaild_iterator.
 		int operator-(const iterator &rhs) const
 		{
-			//TODO
+			return ptr - rhs.ptr;
 		}
 		iterator& operator+=(const int &n)
 		{
-			//TODO
+			ptr += n;
+			return *this;
 		}
 		iterator& operator-=(const int &n)
 		{
-			//TODO
+			ptr -= n;
+			return *this;
 		}
-		/**
-		 * TODO iter++
-		 */
-		iterator operator++(int) {}
-		/**
-		 * TODO ++iter
-		 */
-		iterator& operator++() {}
-		/**
-		 * TODO iter--
-		 */
-		iterator operator--(int) {}
-		/**
-		 * TODO --iter
-		 */
-		iterator& operator--() {}
-		/**
-		 * TODO *it
-		 */
-		T& operator*() const{}
-		/**
-		 * a operator to check whether two iterators are same (pointing to the same memory address).
-		 */
-		bool operator==(const iterator &rhs) const {}
-		bool operator==(const const_iterator &rhs) const {}
-		/**
-		 * some other operator for iterator.
-		 */
-		bool operator!=(const iterator &rhs) const {}
-		bool operator!=(const const_iterator &rhs) const {}
+		iterator operator++(int)
+		{
+			iterator tmp = *this;
+			++ptr;
+			return tmp;
+		}
+		iterator& operator++()
+		{
+			++ptr;
+			return *this;
+		}
+		iterator operator--(int)
+		{
+			iterator tmp = *this;
+			--ptr;
+			return tmp;
+		}
+		iterator& operator--()
+		{
+			--ptr;
+			return *this;
+		}
+		T& operator*() const
+		{
+			return *ptr;
+		}
+		bool operator==(const iterator &rhs) const
+		{
+			return ptr == rhs.ptr;
+		}
+		bool operator==(const const_iterator &rhs) const
+		{
+			return ptr == rhs.ptr;
+		}
+		bool operator!=(const iterator &rhs) const
+		{
+			return ptr != rhs.ptr;
+		}
+		bool operator!=(const const_iterator &rhs) const
+		{
+			return ptr != rhs.ptr;
+		}
+		friend class vector;
+		friend class const_iterator;
 	};
-	/**
-	 * TODO
-	 * has same function as iterator, just for a const object.
-	 */
+
 	class const_iterator
 	{
 	public:
@@ -122,106 +108,342 @@ public:
 		using iterator_category = std::output_iterator_tag;
 
 	private:
-		/*TODO*/
+		const T *ptr;
+	public:
+		const_iterator(const T *p = nullptr) : ptr(p) {}
+		const_iterator(const iterator &it) : ptr(it.ptr) {}
 
+		const_iterator operator+(const int &n) const
+		{
+			return const_iterator(ptr + n);
+		}
+		const_iterator operator-(const int &n) const
+		{
+			return const_iterator(ptr - n);
+		}
+		int operator-(const const_iterator &rhs) const
+		{
+			return ptr - rhs.ptr;
+		}
+		const_iterator& operator+=(const int &n)
+		{
+			ptr += n;
+			return *this;
+		}
+		const_iterator& operator-=(const int &n)
+		{
+			ptr -= n;
+			return *this;
+		}
+		const_iterator operator++(int)
+		{
+			const_iterator tmp = *this;
+			++ptr;
+			return tmp;
+		}
+		const_iterator& operator++()
+		{
+			++ptr;
+			return *this;
+		}
+		const_iterator operator--(int)
+		{
+			const_iterator tmp = *this;
+			--ptr;
+			return tmp;
+		}
+		const_iterator& operator--()
+		{
+			--ptr;
+			return *this;
+		}
+		const T& operator*() const
+		{
+			return *ptr;
+		}
+		bool operator==(const iterator &rhs) const
+		{
+			return ptr == rhs.ptr;
+		}
+		bool operator==(const const_iterator &rhs) const
+		{
+			return ptr == rhs.ptr;
+		}
+		bool operator!=(const iterator &rhs) const
+		{
+			return ptr != rhs.ptr;
+		}
+		bool operator!=(const const_iterator &rhs) const
+		{
+			return ptr != rhs.ptr;
+		}
 	};
-	/**
-	 * TODO Constructs
-	 * At least two: default constructor, copy constructor
-	 */
-	vector() {}
-	vector(const vector &other) {}
-	/**
-	 * TODO Destructor
-	 */
-	~vector() {}
-	/**
-	 * TODO Assignment operator
-	 */
-	vector &operator=(const vector &other) {}
-	/**
-	 * assigns specified element with bounds checking
-	 * throw index_out_of_bound if pos is not in [0, size)
-	 */
-	T & at(const size_t &pos) {}
-	const T & at(const size_t &pos) const {}
-	/**
-	 * assigns specified element with bounds checking
-	 * throw index_out_of_bound if pos is not in [0, size)
-	 * !!! Pay attentions
-	 *   In STL this operator does not check the boundary but I want you to do.
-	 */
-	T & operator[](const size_t &pos) {}
-	const T & operator[](const size_t &pos) const {}
-	/**
-	 * access the first element.
-	 * throw container_is_empty if size == 0
-	 */
-	const T & front() const {}
-	/**
-	 * access the last element.
-	 * throw container_is_empty if size == 0
-	 */
-	const T & back() const {}
-	/**
-	 * returns an iterator to the beginning.
-	 */
-	iterator begin() {}
-	const_iterator begin() const {}
-	const_iterator cbegin() const {}
-	/**
-	 * returns an iterator to the end.
-	 */
-	iterator end() {}
-	const_iterator end() const {}
-	const_iterator cend() const {}
-	/**
-	 * checks whether the container is empty
-	 */
-	bool empty() const {}
-	/**
-	 * returns the number of elements
-	 */
-	size_t size() const {}
-	/**
-	 * clears the contents
-	 */
-	void clear() {}
-	/**
-	 * inserts value before pos
-	 * returns an iterator pointing to the inserted value.
-	 */
-	iterator insert(iterator pos, const T &value) {}
-	/**
-	 * inserts value at index ind.
-	 * after inserting, this->at(ind) == value
-	 * returns an iterator pointing to the inserted value.
-	 * throw index_out_of_bound if ind > size (in this situation ind can be size because after inserting the size will increase 1.)
-	 */
-	iterator insert(const size_t &ind, const T &value) {}
-	/**
-	 * removes the element at pos.
-	 * return an iterator pointing to the following element.
-	 * If the iterator pos refers the last element, the end() iterator is returned.
-	 */
-	iterator erase(iterator pos) {}
-	/**
-	 * removes the element with index ind.
-	 * return an iterator pointing to the following element.
-	 * throw index_out_of_bound if ind >= size
-	 */
-	iterator erase(const size_t &ind) {}
-	/**
-	 * adds an element to the end.
-	 */
-	void push_back(const T &value) {}
-	/**
-	 * remove the last element from the end.
-	 * throw container_is_empty if size() == 0
-	 */
-	void pop_back() {}
-};
 
+private:
+	T *begin_ptr;
+	T *end_ptr;
+	T *cap_ptr;
+	size_t sz;
+	size_t cap;
+
+	void reserve(size_t new_cap)
+	{
+		if (new_cap <= cap)
+			return;
+		T *new_begin = static_cast<T*>(::operator new(new_cap * sizeof(T)));
+		T *new_end = new_begin;
+		for (size_t i = 0; i < sz; ++i)
+		{
+			::new (new_end) T(begin_ptr[i]);
+			++new_end;
+		}
+		for (size_t i = 0; i < sz; ++i)
+			begin_ptr[i].~T();
+		::operator delete(begin_ptr);
+		begin_ptr = new_begin;
+		end_ptr = new_end;
+		cap_ptr = begin_ptr + new_cap;
+		cap = new_cap;
+	}
+
+public:
+	vector() : begin_ptr(nullptr), end_ptr(nullptr), cap_ptr(nullptr), sz(0), cap(0) {}
+
+	vector(const vector &other) : begin_ptr(nullptr), end_ptr(nullptr), cap_ptr(nullptr), sz(0), cap(0)
+	{
+		if (other.sz > 0)
+		{
+			begin_ptr = static_cast<T*>(::operator new(other.sz * sizeof(T)));
+			end_ptr = begin_ptr;
+			cap_ptr = begin_ptr + other.sz;
+			cap = other.sz;
+			for (size_t i = 0; i < other.sz; ++i)
+			{
+				::new (end_ptr) T(other.begin_ptr[i]);
+				++end_ptr;
+			}
+			sz = other.sz;
+		}
+	}
+
+	~vector()
+	{
+		for (size_t i = 0; i < sz; ++i)
+			begin_ptr[i].~T();
+		::operator delete(begin_ptr);
+	}
+
+	vector &operator=(const vector &other)
+	{
+		if (this == &other)
+			return *this;
+		for (size_t i = 0; i < sz; ++i)
+			begin_ptr[i].~T();
+		::operator delete(begin_ptr);
+		begin_ptr = nullptr;
+		end_ptr = nullptr;
+		cap_ptr = nullptr;
+		sz = 0;
+		cap = 0;
+		if (other.sz > 0)
+		{
+			begin_ptr = static_cast<T*>(::operator new(other.sz * sizeof(T)));
+			end_ptr = begin_ptr;
+			cap_ptr = begin_ptr + other.sz;
+			cap = other.sz;
+			for (size_t i = 0; i < other.sz; ++i)
+			{
+				::new (end_ptr) T(other.begin_ptr[i]);
+				++end_ptr;
+			}
+			sz = other.sz;
+		}
+		return *this;
+	}
+
+	T & at(const size_t &pos)
+	{
+		if (pos >= sz)
+			throw index_out_of_bound();
+		return begin_ptr[pos];
+	}
+
+	const T & at(const size_t &pos) const
+	{
+		if (pos >= sz)
+			throw index_out_of_bound();
+		return begin_ptr[pos];
+	}
+
+	T & operator[](const size_t &pos)
+	{
+		if (pos >= sz)
+			throw index_out_of_bound();
+		return begin_ptr[pos];
+	}
+
+	const T & operator[](const size_t &pos) const
+	{
+		if (pos >= sz)
+			throw index_out_of_bound();
+		return begin_ptr[pos];
+	}
+
+	const T & front() const
+	{
+		if (sz == 0)
+			throw container_is_empty();
+		return begin_ptr[0];
+	}
+
+	const T & back() const
+	{
+		if (sz == 0)
+			throw container_is_empty();
+		return begin_ptr[sz - 1];
+	}
+
+	iterator begin()
+	{
+		return iterator(begin_ptr);
+	}
+
+	const_iterator begin() const
+	{
+		return const_iterator(begin_ptr);
+	}
+
+	const_iterator cbegin() const
+	{
+		return const_iterator(begin_ptr);
+	}
+
+	iterator end()
+	{
+		return iterator(end_ptr);
+	}
+
+	const_iterator end() const
+	{
+		return const_iterator(end_ptr);
+	}
+
+	const_iterator cend() const
+	{
+		return const_iterator(end_ptr);
+	}
+
+	bool empty() const
+	{
+		return sz == 0;
+	}
+
+	size_t size() const
+	{
+		return sz;
+	}
+
+	void clear()
+	{
+		for (size_t i = 0; i < sz; ++i)
+			begin_ptr[i].~T();
+		sz = 0;
+		end_ptr = begin_ptr;
+	}
+
+	iterator insert(iterator pos, const T &value)
+	{
+		size_t idx = pos - begin();
+		if (sz == cap)
+		{
+			size_t new_cap = cap == 0 ? 1 : cap * 2;
+			T *new_begin = static_cast<T*>(::operator new(new_cap * sizeof(T)));
+			T *new_end = new_begin;
+			for (size_t i = 0; i < idx; ++i)
+			{
+				::new (new_end) T(begin_ptr[i]);
+				++new_end;
+			}
+			::new (new_end) T(value);
+			++new_end;
+			for (size_t i = idx; i < sz; ++i)
+			{
+				::new (new_end) T(begin_ptr[i]);
+				++new_end;
+			}
+			for (size_t i = 0; i < sz; ++i)
+				begin_ptr[i].~T();
+			::operator delete(begin_ptr);
+			begin_ptr = new_begin;
+			end_ptr = new_end;
+			cap_ptr = begin_ptr + new_cap;
+			cap = new_cap;
+			++sz;
+			return iterator(begin_ptr + idx);
+		}
+		else
+		{
+			::new (end_ptr) T(begin_ptr[sz - 1]);
+			++end_ptr;
+			for (size_t i = sz; i > idx; --i)
+				begin_ptr[i] = begin_ptr[i - 1];
+			begin_ptr[idx] = value;
+			++sz;
+			return iterator(begin_ptr + idx);
+		}
+	}
+
+	iterator insert(const size_t &ind, const T &value)
+	{
+		if (ind > sz)
+			throw index_out_of_bound();
+		return insert(begin() + ind, value);
+	}
+
+	iterator erase(iterator pos)
+	{
+		size_t idx = pos - begin();
+		if (idx >= sz)
+			throw index_out_of_bound();
+		begin_ptr[idx].~T();
+		for (size_t i = idx; i < sz - 1; ++i)
+		{
+			::new (begin_ptr + i) T(begin_ptr[i + 1]);
+			begin_ptr[i + 1].~T();
+		}
+		--sz;
+		--end_ptr;
+		return iterator(begin_ptr + idx);
+	}
+
+	iterator erase(const size_t &ind)
+	{
+		if (ind >= sz)
+			throw index_out_of_bound();
+		return erase(begin() + ind);
+	}
+
+	void push_back(const T &value)
+	{
+		if (sz == cap)
+		{
+			size_t new_cap = cap == 0 ? 1 : cap * 2;
+			reserve(new_cap);
+		}
+		::new (end_ptr) T(value);
+		++end_ptr;
+		++sz;
+	}
+
+	void pop_back()
+	{
+		if (sz == 0)
+			throw container_is_empty();
+		--end_ptr;
+		--sz;
+		end_ptr->~T();
+	}
+};
 
 }
 
